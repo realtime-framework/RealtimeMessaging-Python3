@@ -56,7 +56,8 @@ def save_authentication(url, is_cluster, authentication_token, is_private, appli
     if not isinstance(channels_permissions, dict):
         raise OrtcError('Invalid channels permissions')
     post_str = 'AT='+authentication_token+'&AK='+application_key+'&PK='+private_key+'&TTL='+str(time_to_live)+'&PVT='+('1' if is_private==True else '0')+'&TP='+str(len(channels_permissions))
-    for k,v in channels_permissions.iteritems():
+    for k in channels_permissions:
+        v = channels_permissions[k]
         if not re.compile('^[\w\-:\/.]+$').match(k):
             raise OrtcError('Invalid channel name: '+k)
         post_str += '&'+k+'='+v
@@ -770,7 +771,8 @@ class OrtcClient(object):
                     self._permissions = json.loads(pgrp[0].replace(r'\"', r'"'))
                 if self._state == states.RECONNECTING:
                     self._state = states.CONNECTED
-                    for n, ch in self._channels.iteritems():
+                    for n in self._channels:
+                        ch = self._channels[n]
                         self.subscribe(ch.name, True, ch.callback)
                     if self.on_reconnected_callback:
                         self.on_reconnected_callback(self)
